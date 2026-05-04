@@ -9,12 +9,17 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: stable
+          flutter-version: 3.22.3
+          channel: stable
+
+      - name: Flutter doctor
+        run: flutter doctor
 
       - name: Install dependencies
         run: flutter pub get
@@ -22,7 +27,7 @@ jobs:
       - name: Build iOS (no codesign)
         run: flutter build ios --release --no-codesign
 
-      - name: Archive
+      - name: Archive app
         run: |
           cd ios
           xcodebuild -workspace Runner.xcworkspace \
