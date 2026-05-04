@@ -1,4 +1,4 @@
-name: Build iOS IPA
+name: Build iOS Archive
 
 on:
   push:
@@ -41,20 +41,8 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             DEVELOPMENT_TEAM=""
 
-      - name: Export IPA
-        run: |
-          cd ios
-          xcodebuild -exportArchive \
-            -archivePath build/Runner.xcarchive \
-            -exportPath build/ipa \
-            -exportOptionsPlist ExportOptions.plist \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            DEVELOPMENT_TEAM=""
-
-      - name: Upload IPA
+      - name: Upload Archive
         uses: actions/upload-artifact@v4
         with:
-          name: ios-ipa
-          path: ios/build/ipa
+          name: ios-archive
+          path: ios/build/Runner.xcarchive
