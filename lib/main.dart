@@ -25,12 +25,13 @@ class CatPage extends StatefulWidget {
 
 class _CatPageState extends State<CatPage> {
   String imageUrl = '';
+  bool isLoading = false;
 
   void getRandomCat() {
     setState(() {
-      // timestamp нужен, чтобы каждый раз была новая картинка
+      isLoading = true;
       imageUrl =
-          'https://cataas.com/cat?${DateTime.now().millisecondsSinceEpoch}';
+          'https://picsum.photos/500?random=${DateTime.now().millisecondsSinceEpoch}';
     });
   }
 
@@ -44,24 +45,29 @@ class _CatPageState extends State<CatPage> {
         children: [
           Expanded(
             child: Center(
-              child: imageUrl.isEmpty
-                  ? const Text(
+              child: isLoading
+                  ? Image.network(
+                      imageUrl,
+                      fit: BoxFit.contain,
+                      loadingBuilder: (context, child, progress) {
+                        if (progress == null) {
+                          // загрузка завершена
+                          Future.microtask(() {
+                            setState(() {
+                              isLoading = false;
+                            });
+                          });
+                          return child;
+                        }
+                        return const CircularProgressIndicator();
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Text('Ошибка загрузки 😢');
+                      },
+                    )
+                  : const Text(
                       'Нажми кнопку 🐾',
                       style: TextStyle(fontSize: 20),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Image.network(
-                        imageUrl,
-                        fit: BoxFit.contain,
-                        loadingBuilder: (context, child, progress) {
-                          if (progress == null) return child;
-                          return const CircularProgressIndicator();
-                        },
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Text('Ошибка загрузки 😢');
-                        },
-                      ),
                     ),
             ),
           ),
